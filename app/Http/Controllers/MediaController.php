@@ -14,9 +14,9 @@ class MediaController extends Controller
      */
     public function index()
     {
-        $media = Media::all();
+        $medias = Media::all();
         return view('dashboard', [
-            'media' => $media,
+            'medias' => $medias,
         ]);
     }
 
@@ -73,7 +73,8 @@ class MediaController extends Controller
 
             // dd($path_2[$last_image]);
             $path_image = $request->file('path')->store('public/image');
-            $path_image = $request->file('path')->store('storage/image');
+            // $path_image = $request->file('path')->store('storage/image');
+            $path_image = $path_video = str_replace('public', 'storage', $path_image);
 
             $media = new Media();
             $media->pemilik = $request->pemilik;
@@ -95,7 +96,11 @@ class MediaController extends Controller
 
             // Masukkan file ke dalam folder public/storage/video
             $path_video = $request->file('path')->store('public/video');
-            $path_video = $request->file('path')->store('storage/video');
+
+            // Change public/image/woV3gCWXXAxk0UsN1IsDPG60Aczioie6GfraV9Nn.jpg to storage/image/woV3gCWXXAxk0UsN1IsDPG60Aczioie6GfraV9Nn.jpg
+            $path_video = $path_video = str_replace('public', 'storage', $path_video);
+
+            // $path_video = $request->file('path')->store('storage/video');
             // dd($path_2[$last_video]);
             $media = new Media();
             $media->pemilik = $request->pemilik;
@@ -122,28 +127,32 @@ class MediaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Media $medium)
+    public function edit(Media $media)
     {
         // return redirect()->route('dashboard')->with('error', 'Sistem sedang dalam perbaikan, Hapus dan Upload ulang media');
         return view('media.edit',[
-            'media' => $medium
+            'media' => $media
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Media $medium){
+    public function update(Request $request, Media $media){
         if (!$request->pemilik) {
-            return redirect()->route('media.edit', $medium)->with('Gagal', 'Pemilik tidak boleh kosong');
+            return redirect()->route('media.edit', $media)->with('Gagal', 'Pemilik tidak boleh kosong');
         }
         if (!$request->pengupload) {
-            return redirect()->route('media.edit', $medium)->with('Gagal', 'Pengupload tidak boleh kosong');
+            return redirect()->route('media.edit', $media)->with('Gagal', 'Pengupload tidak boleh kosong');
         }
         
         if ($request->hasFile('path')) {
             // Hapus gambar/video lama jika ada
-            Storage::delete($medium->path);
+            $path = $media->path;  // Combine relative path for public disk
+            $path = explode('storage/', $path); // Split path into array
+            if(Storage::disk('public')->exists($path[1])) {
+                Storage::disk('public')->delete($path[1]);
+            }
 
             // Function to check if the cover is png or jpeg format
             $path = explode('.', $request->file('path')->getClientOriginalName());
@@ -165,8 +174,8 @@ class MediaController extends Controller
                 $path_image = $request->file('path')->store('storage/image');
                 // $path_image = $request->file('path')->store('storage/image');
 
-                $medium->path = $path_image;
-                $medium->type = $path_2[$last_image];
+                $media->path = $path_image;
+                $media->type = $path_2[$last_image];
             } elseif ($path[$last_path] == 'mp4' || $path[$last_path] == 'mkv' || $path[$last_path] == 'MP4' || $path[$last_path] == 'MKV' || $path[$last_path] == 'MPEG' || $path[$last_path] == 'Mkv') {
                 $path_2 = explode('.', $request->file('path')->getClientOriginalName());
                 $last_video = count($path_2) - 1;
@@ -179,15 +188,15 @@ class MediaController extends Controller
                 // $path_video = $request->file('path')->store('storage/video');
                 // dd($path_2[$last_video]);
 
-                $medium->path = $path_video;
-                $medium->type = $path_2[$last_video];
+                $media->path = $path_video;
+                $media->type = $path_2[$last_video];
             } else {
-                return redirect()->route('media.edit', $medium)->with('Gagal', 'Format tidak didukung');
+                return redirect()->route('media.edit', $media)->with('Gagal', 'Format tidak didukung');
             }
         }
-        $medium->pemilik = $request->pemilik;
-        $medium->pengupload = $request->pengupload;
-        $medium->save();
+        $media->pemilik = $request->pemilik;
+        $media->pengupload = $request->pengupload;
+        $media->save();
 
         return redirect()->route('dashboard')->with('success', 'Berhasil Mengupdate');
     }
@@ -196,14 +205,20 @@ class MediaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Media $medium)
+    public function destroy(Media $media)
     {
         try {
-            // Menghapus file terkait dari storage (public/image atau public/video)
-            Storage::delete($medium->path);
-            
+            // Path dari database storage/image/4abvseNa2yCk9fc0U9gqW2sQwQUwcp5DT5af8BW4.jpg
+            // Path dari storage local storage\app\public\image\4abvseNa2yCk9fc0U9gqW2sQwQUwcp5DT5af8BW4.jpg
+            $path = $media->path;  // Combine relative path for public disk
+            $path = explode('storage/', $path); // Split path into array
+            // dd(Storage::disk('public')->exists($path[1]));
+
+            if(Storage::disk('public')->exists($path[1])) {
+                Storage::disk('public')->delete($path[1]);
+            }
             // Menghapus data Media dari database
-            $medium->delete();
+            $media->delete();
             
             return redirect()->route('dashboard')
                 ->with('success', 'Media berhasil dihapus.');

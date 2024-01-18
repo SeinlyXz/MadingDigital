@@ -48,28 +48,21 @@ Route::middleware([
         Route::post('media', [MediaController::class, 'store'])->name('media.store');
 
         // Menampilkan media tertentu
-        Route::get('media/{medium}', [MediaController::class, 'show'])->name('media.show');
+        Route::get('media/{media}', [MediaController::class, 'show'])->name('media.show');
 
         // Menampilkan formulir untuk mengedit media
-        Route::get('media/{medium}/edit', [MediaController::class, 'edit'])->name('media.edit');
+        Route::get('media/{media}/edit', [MediaController::class, 'edit'])->name('media.edit');
 
         // Mengupdate media
-        Route::put('media/{medium}', [MediaController::class, 'update'])->name('media.update');
+        Route::put('media/{media}', [MediaController::class, 'update'])->name('media.update');
         
         // Menghapus media
-        Route::delete('media/{medium}', [MediaController::class, 'destroy'])->name('media.destroy');
+        Route::delete('media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
 
         Route::get('/media', function() {
             return redirect()->route('dashboard');
         });
-        Route::get('/dashboard', function () {
-            
-            $medias = Media::all();
-            return view('dashboard',[
-
-            'medias' => $medias
-            
-        ]);
-    })->name('dashboard');
+        
+        Route::get('/dashboard', [MediaController::class, 'index'])->name('dashboard');
 
 });

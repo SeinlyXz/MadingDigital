@@ -12,9 +12,7 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Styles -->
-        <link rel="stylesheet" href="{{ asset('/build/assets/app-beeaeb24.css') }}">
-        <script src="{{ asset('/build/assets/app-dbda1af7.js') }}" defer></script>
-        {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         @livewireStyles
 
