@@ -16,7 +16,7 @@
                             playsinline
                             controls
                             class="absolute inset-0 w-full h-full object-cover"
-                            onended="window.location.href = '{{ url('guru') }}'"
+                            onended="window.location.href = '{{ url('siswa') }}'"
                         >
                             <source src="{{ route('video.serve', ['filename' => basename($mediaItem->path)]) }}?v={{ $mediaItem->version }}" type="video/mp4">
                             Your browser does not support the video tag.
@@ -28,5 +28,5 @@
             @endforeach
         @endif
     </div>
-    @vite('resources/js/guru.js')
+    @vite('resources/js/tatausaha.js')
 </x-guest-layout>

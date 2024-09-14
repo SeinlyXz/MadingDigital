@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Leave this blank if you still in development
         // Uncomment this if you want to force https in production
-        // if(env( key: 'APP_ENV') !== 'local')
-        //     URL::forceScheme(scheme: 'https');
+        if(env( key: 'APP_ENV') !== 'local')
+            URL::forceScheme(scheme: 'https');
     }
 }

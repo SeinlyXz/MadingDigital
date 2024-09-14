@@ -19,6 +19,7 @@
                         <option disabled selected>Pilih Audience</option>
                         <option value="siswa">Siswa</option>
                         <option value="guru">Guru</option>
+                        <option value="tata-usaha">TU</option>
                     </select>
                     <div class="bg-gray-300 rounded-xl shadow-lg shadow-gray-400 flex flex-col p-10 my-10">
                         <div class="flex flex-col mb-5">
@@ -31,7 +32,7 @@
                         <input type="file" name="path" class="bg-gray-800 text-white rounded-xl p-5" required>
                         <span class="text-gray-500 text-sm mb-4">Format yang didukung: mp4, jpeg, png</span>
                         <input type="text" name="pengupload" class="bg-gray-300 text-gray-700 rounded-xl" placeholder="Pengupload" required autocomplete="off">
-                        <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white mt-10 px-4 py-1 rounded-xl">Upload</button>
+                        <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white mt-10 px-4 py-1 rounded-xl submit">Upload</button>
                     </div>
                 </div>
             </form>
@@ -40,4 +41,14 @@
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            let loading = "<p>Upload</p>"
+            $('.submit').append(loading);
+            // listen to button submit, if the button is clicked, change the text to 'Uploading...'
+            $('#submit').click(function() {
+                $(this).text('Uploading...');
+            });
+        });
+    </script>
 </x-app-layout>

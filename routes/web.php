@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Media;
-use App\Http\Controllers\{MediaController, SiswaController, GuruController};
+use App\Http\Controllers\{MediaController, SiswaController, GuruController, TataUsahaController};
 
 /*
 |--------------------------------------------------------------------------
@@ -23,15 +23,10 @@ Route::get('/', function () {
     return redirect('siswa');
 });
 
-Route::get('/siswa', function(){
-    $media = Media::where('pemilik', 'siswa')->get();
-    return view('siswa.index', ['media' => $media]);
-});
-
-Route::get('/guru', function(){
-    $media = Media::where('pemilik', 'guru')->get();
-    return view('guru.index', ['media' => $media]);
-});
+Route::get('/tatausaha', [SiswaController::class, 'index']);
+Route::get('/guru', [GuruController::class, 'index']);
+Route::get('/siswa', [TataUsahaController::class, 'index']);
+Route::get('/video/{filename}', [MediaController::class, 'serveVideo'])->name('video.serve');
 
 Route::middleware([
     
@@ -66,3 +61,13 @@ Route::middleware([
         Route::get('/dashboard', [MediaController::class, 'index'])->name('dashboard');
 
 });
+
+// Route::get('/video/{filename}', function ($filename) {
+//     $path = storage_path('app/public/video/' . $filename);
+    
+//     if (!file_exists($path)) {
+//         abort(404, 'File not found');
+//     }
+    
+//     return response()->file($path);
+// });

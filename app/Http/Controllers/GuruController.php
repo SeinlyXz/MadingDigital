@@ -4,20 +4,34 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Media;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GuruController extends Controller
 {
-    public function index(){
-        // Misalnya, Anda ingin mengambil video
+    /**
+     * Display the media list and serve videos with cache control.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        // Retrieve media related to 'guru' and include cache-busting information
         $media = Media::where('pemilik', 'guru')->get();
-        // Ambil ID dari table media
-        $id = Media::where('pemilik', 'guru')->pluck('id');
 
-        // Atau jika Anda ingin mengambil gambar
-        // $media = Media::where('owner_type', 'siswa')
-        //               ->where('media_type', 'gambar')
-        //               ->get();
+        // Add cache-busting version parameter based on file modification time
+        foreach ($media as $mediaItem) {
+            // Ensure the path is correctly formed
+            $filePath = storage_path('app/public/video/' . basename($mediaItem->path));
 
-        return view('guru.index', ['media' => $media, 'id' => $id]);
+            // Check if the file exists before trying to get its modification time
+            if (file_exists($filePath)) {
+                $mediaItem->version = filemtime($filePath);
+            } else {
+                $mediaItem->version = time(); // Fallback to current time if file does not exist
+            }
+        }
+
+        // Pass media data to the view
+        return view('guru.index', ['media' => $media]);
     }
 }
